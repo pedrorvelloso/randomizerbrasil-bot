@@ -6,6 +6,7 @@ import {
   MessageFlags,
 } from 'discord.js';
 import { Command, isAdmin, formatTwitchUrl } from '../lib/discord';
+import { logger } from '../lib/logger';
 import { getAllRunners } from '../lib/supabase';
 
 export const command: Command = {
@@ -16,7 +17,16 @@ export const command: Command = {
   async execute(interaction: ChatInputCommandInteraction) {
     const member = interaction.member as GuildMember;
 
+    const ctx = {
+      command: 'list',
+      userId: interaction.user.id,
+      guildId: interaction.guildId ?? undefined,
+    };
+
+    logger.info('Command executed', ctx);
+
     if (!isAdmin(member)) {
+      logger.warn('Non-admin tried to use admin command', ctx);
       await interaction.reply({
         content: '❌ Este comando está disponível apenas para admins.',
         flags: [MessageFlags.Ephemeral],
@@ -30,11 +40,14 @@ export const command: Command = {
       const runners = await getAllRunners();
 
       if (runners.length === 0) {
+        logger.info('No runners registered', ctx);
         await interaction.editReply({
           content: 'ℹ️ Nenhum runner está registrado no momento.',
         });
         return;
       }
+
+      logger.info('Runners listed', { ...ctx, count: runners.length });
 
       const embed = new EmbedBuilder()
         .setTitle('📋 Runners Registrados')
@@ -88,7 +101,7 @@ export const command: Command = {
         await interaction.editReply({ embeds: embeds.slice(0, 10) }); // Limite do Discord: 10 embeds
       }
     } catch (error) {
-      console.error('Erro no comando /list:', error);
+      logger.error('Failed to list runners', { ...ctx, error: String(error) });
       await interaction.editReply({
         content: '❌ Ocorreu um erro ao buscar a lista de runners. Tente novamente mais tarde.',
       });

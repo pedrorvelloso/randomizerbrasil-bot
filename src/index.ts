@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { Events, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { createClient, ExtendedClient } from './lib/discord';
+import { logger } from './lib/logger';
 import { command as twitchCommand } from './commands/twitch';
 import { command as mytwitchCommand } from './commands/mytwitch';
 import { command as unlinkCommand } from './commands/unlink';
@@ -17,7 +18,10 @@ client.commands.set(removeCommand.data.name, removeCommand);
 client.commands.set(listCommand.data.name, listCommand);
 
 client.once(Events.ClientReady, (readyClient) => {
-  console.log(`Bot pronto! Logado como ${readyClient.user.tag}`);
+  logger.info('Bot started', {
+    username: readyClient.user.tag,
+    guildCount: readyClient.guilds.cache.size,
+  });
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -26,14 +30,23 @@ client.on(Events.InteractionCreate, async (interaction) => {
   const command = client.commands.get(interaction.commandName);
 
   if (!command) {
-    console.error(`Nenhum comando encontrado para ${interaction.commandName}.`);
+    logger.warn('Unknown command received', {
+      command: interaction.commandName,
+      userId: interaction.user.id,
+      guildId: interaction.guildId ?? undefined,
+    });
     return;
   }
 
   try {
     await command.execute(interaction as ChatInputCommandInteraction);
   } catch (error) {
-    console.error(`Erro ao executar ${interaction.commandName}:`, error);
+    logger.error('Unhandled command error', {
+      command: interaction.commandName,
+      userId: interaction.user.id,
+      guildId: interaction.guildId ?? undefined,
+      error: String(error),
+    });
 
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp({
