@@ -32,6 +32,7 @@ async function initialize() {
       logger.warn('Unknown command received', {
         command: interaction.commandName,
         userId: interaction.user.id,
+        userTag: interaction.user.tag,
         guildId: interaction.guildId ?? undefined,
       });
       return;
@@ -43,6 +44,7 @@ async function initialize() {
       logger.error('Unhandled command error', {
         command: interaction.commandName,
         userId: interaction.user.id,
+        userTag: interaction.user.tag,
         guildId: interaction.guildId ?? undefined,
         error: String(error),
       });
