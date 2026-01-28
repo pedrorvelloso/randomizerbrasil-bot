@@ -20,6 +20,7 @@ export const command: Command = {
     const ctx = {
       command: 'list',
       userId: interaction.user.id,
+      userTag: interaction.user.tag,
       guildId: interaction.guildId ?? undefined,
     };
 
