@@ -6,7 +6,7 @@ import { getRunnerByStreamName, deleteRunnerByStreamName } from '../lib/supabase
 export const command: Command = {
   data: new SlashCommandBuilder()
     .setName('remove')
-    .setDescription('Remover um registro da Twitch (apenas admins)')
+    .setDescription('Remover um registro da Twitch (apenas usuários permitidos)')
     .addStringOption((option) =>
       option
         .setName('username')
