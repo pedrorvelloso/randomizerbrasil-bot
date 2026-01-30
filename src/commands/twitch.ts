@@ -22,7 +22,7 @@ export const command: Command = {
     .addUserOption((option) =>
       option
         .setName('user')
-        .setDescription('Usuário para registrar (apenas admins)')
+        .setDescription('Usuário para registrar (apenas usuários permitidos)')
         .setRequired(false)
     ),
 
