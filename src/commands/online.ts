@@ -24,7 +24,7 @@ export const command: Command = {
 
       if (count === 0) {
         logger.info('No streams online', ctx);
-        await interaction.editReply('Nenhuma livestream online no momento.');
+        await interaction.editReply('⚪ Nenhuma livestream online no momento.');
         return;
       }
 
