@@ -8,6 +8,7 @@ import { logger } from '../lib/logger';
 import { getStreamers } from '../lib/rbr-api';
 
 export const command: Command = {
+  isGlobal: true,
   data: new SlashCommandBuilder()
     .setName('online')
     .setDescription('Listar livestreams online'),

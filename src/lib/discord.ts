@@ -11,6 +11,8 @@ import {
 export interface Command {
   data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder;
   execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
+  /** If true, command is registered globally (available in all servers) */
+  isGlobal?: boolean;
 }
 
 export interface ExtendedClient extends Client {

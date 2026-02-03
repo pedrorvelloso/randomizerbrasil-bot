@@ -188,7 +188,7 @@ Check `.env.example` for required variables. Key ones:
 
 - [x] Configure linter (ESLint/Biome) - **Completed: Biome configured**
 - [ ] Add test suite
-- [ ] Implement global vs guild command registration system
+- [x] Implement global vs guild command registration system - **Completed: `/list` and `/online` are global**
 
 ## Assistant Behavior
 
