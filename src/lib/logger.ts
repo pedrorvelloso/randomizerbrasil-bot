@@ -7,7 +7,11 @@ interface LogContext {
   [key: string]: unknown;
 }
 
-function formatLog(level: LogLevel, message: string, context?: LogContext): string {
+function formatLog(
+  level: LogLevel,
+  message: string,
+  context?: LogContext,
+): string {
   const timestamp = new Date().toISOString();
   const contextStr = context ? ` ${JSON.stringify(context)}` : '';
   return `[${timestamp}] [${level.toUpperCase()}] ${message}${contextStr}`;

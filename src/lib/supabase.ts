@@ -1,8 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
-import { Runner, RunnerInsert } from '../types/database';
+import type { Runner, RunnerInsert } from '../types/database';
 
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY!;
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error(
+    'Missing required environment variables: SUPABASE_URL and SUPABASE_SERVICE_KEY',
+  );
+}
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
@@ -11,7 +17,9 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
   },
 });
 
-export async function getRunnerByStreamName(streamName: string): Promise<Runner | null> {
+export async function getRunnerByStreamName(
+  streamName: string,
+): Promise<Runner | null> {
   const { data, error } = await supabase
     .from('runners')
     .select('*')
@@ -25,7 +33,9 @@ export async function getRunnerByStreamName(streamName: string): Promise<Runner 
   return data as Runner | null;
 }
 
-export async function getRunnerBySourceId(sourceId: string): Promise<Runner | null> {
+export async function getRunnerBySourceId(
+  sourceId: string,
+): Promise<Runner | null> {
   const { data, error } = await supabase
     .from('runners')
     .select('*')
@@ -55,7 +65,7 @@ export async function createRunner(runner: RunnerInsert): Promise<Runner> {
 
 export async function updateRunner(
   id: string,
-  updates: Partial<RunnerInsert>
+  updates: Partial<RunnerInsert>,
 ): Promise<Runner> {
   const { data, error } = await supabase
     .from('runners')
@@ -71,7 +81,9 @@ export async function updateRunner(
   return data as Runner;
 }
 
-export async function deleteRunnerByStreamName(streamName: string): Promise<boolean> {
+export async function deleteRunnerByStreamName(
+  streamName: string,
+): Promise<boolean> {
   const { error, count } = await supabase
     .from('runners')
     .delete({ count: 'exact' })
@@ -84,7 +96,9 @@ export async function deleteRunnerByStreamName(streamName: string): Promise<bool
   return (count ?? 0) > 0;
 }
 
-export async function deleteRunnerBySourceId(sourceId: string): Promise<boolean> {
+export async function deleteRunnerBySourceId(
+  sourceId: string,
+): Promise<boolean> {
   const { error, count } = await supabase
     .from('runners')
     .delete({ count: 'exact' })

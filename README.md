@@ -4,10 +4,13 @@ Discord bot to manage the runners/streamers table in Supabase.
 
 ## Stack
 
-- TypeScript
+- TypeScript (strict mode)
+- Node.js
 - discord.js v14+
 - @supabase/supabase-js
 - dotenv
+- Biome (linting & formatting)
+- pnpm (package manager)
 
 ## Commands
 
@@ -61,35 +64,51 @@ RBR_API_URL=             # RBR API URL (e.g., https://rbr.watch)
 ### 3. Install dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### 4. Register commands
 
 ```bash
-npm run register
+pnpm register
 ```
 
 ### 5. Start the bot
 
 ```bash
 # Development
-npm run dev
+pnpm dev
 
 # Production
-npm run build
-npm start
+pnpm build
+pnpm start
 ```
 
 ## Scripts
 
 | Script | Description |
 |--------|-------------|
-| `npm run dev` | Start in development mode |
-| `npm run build` | Compile TypeScript |
-| `npm start` | Start compiled version |
-| `npm run register` | Register slash commands |
-| `npm run clear` | Remove all commands |
+| `pnpm dev` | Start in development mode (auto-reload) |
+| `pnpm build` | Compile TypeScript |
+| `pnpm start` | Start compiled version |
+| `pnpm register` | Register slash commands |
+| `pnpm clear` | Remove all commands |
+| `pnpm lint` | Check code with Biome linter |
+| `pnpm lint:fix` | Fix linting issues automatically |
+| `pnpm format` | Check code formatting |
+| `pnpm format:fix` | Format code automatically |
+| `pnpm check` | Run both lint and format checks |
+| `pnpm check:fix` | Fix both lint and format issues |
+
+## Code Quality
+
+This project uses [Biome](https://biomejs.dev/) for linting and formatting:
+
+- **Linting:** Enforces code quality rules and best practices
+- **Formatting:** Maintains consistent code style (2-space indentation, single quotes)
+- **Pre-configured:** Run `pnpm check` before committing changes
+
+Configuration is in [biome.json](biome.json).
 
 ## Business Rules
 
@@ -114,9 +133,11 @@ src/
     list.ts             # /list
     online.ts           # /online
   lib/
-    supabase.ts         # Supabase client
-    discord.ts          # Bot configuration
+    supabase.ts         # Supabase client & database functions
+    discord.ts          # Bot configuration & types
     rbr-api.ts          # RBR API integration
+    load-commands.ts    # Dynamic command loader
+    logger.ts           # Structured logging
   types/
-    database.ts         # Supabase types
+    database.ts         # Database type definitions
 ```

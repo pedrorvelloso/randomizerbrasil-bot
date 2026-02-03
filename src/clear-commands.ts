@@ -1,34 +1,44 @@
 import 'dotenv/config';
 import { REST, Routes } from 'discord.js';
 
-const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
+const discordToken = process.env.DISCORD_TOKEN;
+if (!discordToken) {
+  throw new Error('Missing required environment variable: DISCORD_TOKEN');
+}
+
+const rest = new REST({ version: '10' }).setToken(discordToken);
 
 async function clearCommands() {
   try {
-    console.log('Removendo comandos...');
+    console.log('Clearing commands...');
+
+    const clientId = process.env.DISCORD_CLIENT_ID;
+    if (!clientId) {
+      throw new Error(
+        'Missing required environment variable: DISCORD_CLIENT_ID',
+      );
+    }
 
     if (process.env.DISCORD_GUILD_ID) {
       // Clear server commands
       await rest.put(
-        Routes.applicationGuildCommands(
-          process.env.DISCORD_CLIENT_ID!,
-          process.env.DISCORD_GUILD_ID
-        ),
-        { body: [] }
+        Routes.applicationGuildCommands(clientId, process.env.DISCORD_GUILD_ID),
+        { body: [] },
       );
-      console.log(`Comandos do servidor ${process.env.DISCORD_GUILD_ID} removidos.`);
+      console.log(
+        `Guild commands cleared for server ${process.env.DISCORD_GUILD_ID}`,
+      );
     }
 
     // Clear global commands
-    await rest.put(
-      Routes.applicationCommands(process.env.DISCORD_CLIENT_ID!),
-      { body: [] }
-    );
-    console.log('Comandos globais removidos.');
+    await rest.put(Routes.applicationCommands(clientId), {
+      body: [],
+    });
+    console.log('Global commands cleared.');
 
-    console.log('Todos os comandos foram removidos com sucesso!');
+    console.log('All commands have been successfully cleared!');
   } catch (error) {
-    console.error('Erro ao remover comandos:', error);
+    console.error('Error clearing commands:', error);
     process.exit(1);
   }
 }

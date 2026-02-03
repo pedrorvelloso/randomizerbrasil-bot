@@ -1,22 +1,35 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, GuildMember, MessageFlags } from 'discord.js';
-import { Command, isAdmin } from '../lib/discord';
+import {
+  type ChatInputCommandInteraction,
+  type GuildMember,
+  MessageFlags,
+  SlashCommandBuilder,
+} from 'discord.js';
+import { type Command, isAdmin } from '../lib/discord';
 import { logger } from '../lib/logger';
-import { getRunnerByStreamName, deleteRunnerByStreamName } from '../lib/supabase';
+import {
+  deleteRunnerByStreamName,
+  getRunnerByStreamName,
+} from '../lib/supabase';
 
 export const command: Command = {
   data: new SlashCommandBuilder()
     .setName('remove')
-    .setDescription('Remover um registro da Twitch (apenas usuários permitidos)')
+    .setDescription(
+      'Remover um registro da Twitch (apenas usuários permitidos)',
+    )
     .addStringOption((option) =>
       option
         .setName('username')
         .setDescription('Nome de usuário da Twitch para remover')
-        .setRequired(true)
+        .setRequired(true),
     ),
 
   async execute(interaction: ChatInputCommandInteraction) {
     const member = interaction.member as GuildMember;
-    const username = interaction.options.getString('username', true).trim().toLowerCase();
+    const username = interaction.options
+      .getString('username', true)
+      .trim()
+      .toLowerCase();
 
     const ctx = {
       command: 'remove',
@@ -52,16 +65,25 @@ export const command: Command = {
 
       await deleteRunnerByStreamName(username);
 
-      const linkedUser = runner.source_id ? `<@${runner.source_id}>` : 'nenhum usuário vinculado';
+      const linkedUser = runner.source_id
+        ? `<@${runner.source_id}>`
+        : 'nenhum usuário vinculado';
 
-      logger.info('Registration removed by admin', { ...ctx, removedUserId: runner.source_id });
+      logger.info('Registration removed by admin', {
+        ...ctx,
+        removedUserId: runner.source_id,
+      });
       await interaction.editReply({
         content: `✅ Registro de **${runner.stream_name}** removido com sucesso (estava vinculado a ${linkedUser}).`,
       });
     } catch (error) {
-      logger.error('Failed to remove registration', { ...ctx, error: String(error) });
+      logger.error('Failed to remove registration', {
+        ...ctx,
+        error: String(error),
+      });
       await interaction.editReply({
-        content: '❌ Ocorreu um erro ao remover o registro. Tente novamente mais tarde.',
+        content:
+          '❌ Ocorreu um erro ao remover o registro. Tente novamente mais tarde.',
       });
     }
   },

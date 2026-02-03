@@ -1,5 +1,9 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { Command } from '../lib/discord';
+import {
+  type ChatInputCommandInteraction,
+  MessageFlags,
+  SlashCommandBuilder,
+} from 'discord.js';
+import type { Command } from '../lib/discord';
 import { logger } from '../lib/logger';
 import { getStreamers } from '../lib/rbr-api';
 
@@ -29,8 +33,8 @@ export const command: Command = {
       }
 
       // Format response with streamer info
-      const lines = data.map(s =>
-        `**${s.displayName}** - ${s.gameName}\n<${s.twitchUrl}>`
+      const lines = data.map(
+        (s) => `**${s.displayName}** - ${s.gameName}\n<${s.twitchUrl}>`,
       );
 
       // Format timestamp for Discord date/time display
@@ -38,10 +42,13 @@ export const command: Command = {
 
       logger.info('Streams fetched successfully', { ...ctx, count });
       await interaction.editReply({
-        content: `🔴 **${count} livestream(s) online:**\n\n${lines.join('\n\n')}\n\n_Atualizado: <t:${lastUpdated}:f>_`
+        content: `🔴 **${count} livestream(s) online:**\n\n${lines.join('\n\n')}\n\n_Atualizado: <t:${lastUpdated}:f>_`,
       });
     } catch (error) {
-      logger.error('Failed to fetch streamers', { ...ctx, error: String(error) });
+      logger.error('Failed to fetch streamers', {
+        ...ctx,
+        error: String(error),
+      });
       await interaction.editReply('❌ Erro ao buscar livestreams.');
     }
   },
