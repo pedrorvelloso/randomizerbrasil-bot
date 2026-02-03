@@ -8,7 +8,7 @@ async function clearCommands() {
     console.log('Removendo comandos...');
 
     if (process.env.DISCORD_GUILD_ID) {
-      // Limpar comandos do servidor
+      // Clear server commands
       await rest.put(
         Routes.applicationGuildCommands(
           process.env.DISCORD_CLIENT_ID!,
@@ -19,7 +19,7 @@ async function clearCommands() {
       console.log(`Comandos do servidor ${process.env.DISCORD_GUILD_ID} removidos.`);
     }
 
-    // Limpar comandos globais
+    // Clear global commands
     await rest.put(
       Routes.applicationCommands(process.env.DISCORD_CLIENT_ID!),
       { body: [] }

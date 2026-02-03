@@ -45,3 +45,27 @@ export async function getStreamers(): Promise<StreamersResponse> {
 
   return result;
 }
+
+interface Runner {
+  name: string;
+  source: 'db' | 'static';
+  source_id?: string | null;
+}
+
+interface RunnersResponse {
+  success: boolean;
+  data: Runner[];
+  count: number;
+  timestamp: string;
+}
+
+export async function getRunners(): Promise<RunnersResponse> {
+  const baseUrl = process.env.RBR_API_URL;
+  const response = await fetch(`${baseUrl}/api/runners`);
+
+  if (!response.ok) {
+    throw new Error(`API request failed: ${response.status}`);
+  }
+
+  return response.json() as Promise<RunnersResponse>;
+}

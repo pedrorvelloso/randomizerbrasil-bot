@@ -14,7 +14,7 @@ async function registerCommands() {
     console.log(`Carregados ${commands.length} comando(s): ${commandModules.map(c => c.data.name).join(', ')}`);
 
     if (process.env.DISCORD_GUILD_ID) {
-      // Registrar comandos em um servidor específico (mais rápido para desenvolvimento)
+      // Register commands in a specific server (faster for development)
       await rest.put(
         Routes.applicationGuildCommands(
           process.env.DISCORD_CLIENT_ID!,
@@ -24,7 +24,7 @@ async function registerCommands() {
       );
       console.log(`Comandos registrados com sucesso no servidor ${process.env.DISCORD_GUILD_ID}`);
     } else {
-      // Registrar comandos globais (pode levar até uma hora para propagar)
+      // Register global commands (may take up to an hour to propagate)
       await rest.put(
         Routes.applicationCommands(process.env.DISCORD_CLIENT_ID!),
         { body: commands }

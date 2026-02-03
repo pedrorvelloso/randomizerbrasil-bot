@@ -66,6 +66,16 @@ async function initialize() {
   await client.login(process.env.DISCORD_TOKEN);
 }
 
+// Graceful shutdown
+function shutdown() {
+  logger.info('Shutting down...');
+  client.destroy();
+  process.exit(0);
+}
+
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
+
 initialize().catch(error => {
   logger.error('Failed to initialize bot', { error: String(error) });
   process.exit(1);
