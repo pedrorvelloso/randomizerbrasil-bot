@@ -1,6 +1,6 @@
 # Randomizer Brasil Bot
 
-Bot do Discord para gerenciar a tabela de runners/streamers no Supabase.
+Discord bot to manage the runners/streamers table in Supabase.
 
 ## Stack
 
@@ -9,27 +9,28 @@ Bot do Discord para gerenciar a tabela de runners/streamers no Supabase.
 - @supabase/supabase-js
 - dotenv
 
-## Comandos
+## Commands
 
-### Usuários
+### Users
 
-| Comando | Descrição |
-|---------|-----------|
-| `/twitch <username>` | Registrar sua conta da Twitch |
-| `/mytwitch` | Mostrar sua conta da Twitch vinculada |
-| `/unlink` | Remover seu registro |
+| Command | Description |
+|---------|-------------|
+| `/twitch <username>` | Register your Twitch account |
+| `/mytwitch` | Show your linked Twitch account |
+| `/unlink` | Remove your registration |
+| `/online` | List currently live streamers |
+| `/list` | List all registered runners |
 
-### Admins (permissão de banir membros)
+### Admins (ban members permission)
 
-| Comando | Descrição |
-|---------|-----------|
-| `/twitch <username> [user]` | Registrar Twitch para outro usuário |
-| `/remove <username>` | Remover qualquer registro |
-| `/list` | Listar todos os runners registrados |
+| Command | Description |
+|---------|-------------|
+| `/twitch <username> [user]` | Register Twitch for another user |
+| `/remove <username>` | Remove any registration |
 
-## Configuração
+## Setup
 
-### 1. Criar tabela no Supabase
+### 1. Create Supabase table
 
 ```sql
 CREATE TABLE runners (
@@ -40,78 +41,82 @@ CREATE TABLE runners (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Desabilitar RLS ou usar service key
+-- Disable RLS or use service key
 ALTER TABLE runners DISABLE ROW LEVEL SECURITY;
 ```
 
-### 2. Configurar variáveis de ambiente
+### 2. Configure environment variables
 
-Copie `.env.example` para `.env` e preencha:
+Copy `.env.example` to `.env` and fill in:
 
 ```env
-DISCORD_TOKEN=           # Token do bot
-DISCORD_CLIENT_ID=       # ID da aplicação
-DISCORD_GUILD_ID=        # ID do servidor (opcional, para dev)
-SUPABASE_URL=            # URL do projeto Supabase
-SUPABASE_SERVICE_KEY=    # Chave service_role do Supabase
+DISCORD_TOKEN=           # Bot token
+DISCORD_CLIENT_ID=       # Application ID
+DISCORD_GUILD_ID=        # Server ID (optional, for dev)
+SUPABASE_URL=            # Supabase project URL
+SUPABASE_SERVICE_KEY=    # Supabase service_role key
+RBR_API_URL=             # RBR API URL (e.g., https://rbr.watch)
 ```
 
-### 3. Instalar dependências
+### 3. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 4. Registrar comandos
+### 4. Register commands
 
 ```bash
 npm run register
 ```
 
-### 5. Iniciar o bot
+### 5. Start the bot
 
 ```bash
-# Desenvolvimento
+# Development
 npm run dev
 
-# Produção
+# Production
 npm run build
 npm start
 ```
 
 ## Scripts
 
-| Script | Descrição |
-|--------|-----------|
-| `npm run dev` | Iniciar em modo desenvolvimento |
-| `npm run build` | Compilar TypeScript |
-| `npm start` | Iniciar versão compilada |
-| `npm run register` | Registrar comandos slash |
-| `npm run clear` | Remover todos os comandos |
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start in development mode |
+| `npm run build` | Compile TypeScript |
+| `npm start` | Start compiled version |
+| `npm run register` | Register slash commands |
+| `npm run clear` | Remove all commands |
 
-## Regras de Negócio
+## Business Rules
 
-- Um usuário só pode ter uma conta da Twitch vinculada
-- Usernames são únicos na tabela (case-insensitive)
-- Admins podem sobrescrever registros
-- Admins são usuários com permissão de banir membros
+- A user can only have one linked Twitch account
+- Usernames are unique in the table (case-insensitive)
+- Admins can override registrations
+- Admins are users with ban members permission
+- Users can claim unlinked streams (streams without a Discord user)
 
-## Estrutura
+## Structure
 
 ```
 src/
-  index.ts              # Ponto de entrada
-  register-commands.ts  # Script para registrar comandos
-  clear-commands.ts     # Script para limpar comandos
+  index.ts              # Entry point
+  register-commands.ts  # Script to register commands
+  clear-commands.ts     # Script to clear commands
   commands/
     twitch.ts           # /twitch
     mytwitch.ts         # /mytwitch
     unlink.ts           # /unlink
     remove.ts           # /remove
     list.ts             # /list
+    online.ts           # /online
   lib/
-    supabase.ts         # Cliente Supabase
-    discord.ts          # Configuração do bot
+    supabase.ts         # Supabase client
+    discord.ts          # Bot configuration
+    rbr-api.ts          # RBR API integration
   types/
-    database.ts         # Tipos do Supabase
+    database.ts         # Supabase types
 ```

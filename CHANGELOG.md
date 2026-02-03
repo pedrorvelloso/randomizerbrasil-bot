@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-02-03
+
+### Added
+- `/list` command now shows clickable Twitch links and Discord user mentions
+- `/list` command displays last update timestamp
+- Users can claim unlinked streams (streams without Discord user) via `/twitch`
+- Auto-reload dev script using tsx watch mode
+- Graceful shutdown handling for Discord connection
+
+### Changed
+- `/list` command uses 🎮 emoji instead of numbered list
+- Refactored `/twitch` command into smaller, focused functions for better readability
+- Updated all scripts to use tsx instead of ts-node for faster execution
+- Translated README.md to English
+- Translated all code comments to English
+
 ## [1.2.2] - 2026-01-30
 
 ### Changed

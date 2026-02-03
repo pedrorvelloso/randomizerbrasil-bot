@@ -1,22 +1,18 @@
 import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,
-  GuildMember,
-  EmbedBuilder,
   MessageFlags,
 } from 'discord.js';
-import { Command, isAdmin, formatTwitchUrl } from '../lib/discord';
+import { Command } from '../lib/discord';
 import { logger } from '../lib/logger';
-import { getAllRunners } from '../lib/supabase';
+import { getRunners } from '../lib/rbr-api';
 
 export const command: Command = {
   data: new SlashCommandBuilder()
     .setName('list')
-    .setDescription('Listar todos os runners registrados (apenas admins)'),
+    .setDescription('Listar todos os runners'),
 
   async execute(interaction: ChatInputCommandInteraction) {
-    const member = interaction.member as GuildMember;
-
     const ctx = {
       command: 'list',
       userId: interaction.user.id,
@@ -25,87 +21,34 @@ export const command: Command = {
     };
 
     logger.info('Command executed', ctx);
-
-    if (!isAdmin(member)) {
-      logger.warn('Non-admin tried to use admin command', ctx);
-      await interaction.reply({
-        content: '❌ Este comando está disponível apenas para admins.',
-        flags: [MessageFlags.Ephemeral],
-      });
-      return;
-    }
-
     await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
     try {
-      const runners = await getAllRunners();
+      const { data, count, timestamp } = await getRunners();
 
-      if (runners.length === 0) {
+      if (count === 0) {
         logger.info('No runners registered', ctx);
-        await interaction.editReply({
-          content: 'ℹ️ Nenhum runner está registrado no momento.',
-        });
+        await interaction.editReply('ℹ️ Nenhum runner está registrado no momento.');
         return;
       }
 
-      logger.info('Runners listed', { ...ctx, count: runners.length });
+      logger.info('Runners listed', { ...ctx, count });
 
-      const embed = new EmbedBuilder()
-        .setTitle('📋 Runners Registrados')
-        .setColor(0x9146ff)
-        .setFooter({ text: `Total: ${runners.length} runner(s)` })
-        .setTimestamp();
-
-      const runnerList = runners.map((runner, index) => {
-        const user = runner.source_id ? `<@${runner.source_id}>` : '*manual*';
-        return `${index + 1}. [${runner.stream_name}](${formatTwitchUrl(runner.stream_name)}) - ${user}`;
+      // Build runner list with Twitch links and Discord users
+      const runnerList = data.map((runner) => {
+        const link = `[${runner.name}](<https://twitch.tv/${runner.name}>)`;
+        const user = runner.source_id ? ` - <@${runner.source_id}>` : '';
+        return `🎮 ${link}${user}`;
       });
 
-      // Limite de descrição do embed do Discord é 4096 caracteres
-      // Dividir em múltiplos embeds se necessário
-      const chunks: string[] = [];
-      let currentChunk = '';
+      // Format timestamp for Discord
+      const lastUpdated = Math.floor(new Date(timestamp).getTime() / 1000);
+      const message = `📋 **Runners**\n\n${runnerList.join('\n')}\n\n*Total: ${count} runner(s)*\n*Última atualização: <t:${lastUpdated}:f>*`;
 
-      for (const line of runnerList) {
-        if (currentChunk.length + line.length + 1 > 4000) {
-          chunks.push(currentChunk);
-          currentChunk = line;
-        } else {
-          currentChunk += (currentChunk ? '\n' : '') + line;
-        }
-      }
-      if (currentChunk) {
-        chunks.push(currentChunk);
-      }
-
-      if (chunks.length === 1) {
-        embed.setDescription(chunks[0]);
-        await interaction.editReply({ embeds: [embed] });
-      } else {
-        const embeds = chunks.map((chunk, i) => {
-          const pageEmbed = new EmbedBuilder()
-            .setColor(0x9146ff)
-            .setDescription(chunk);
-
-          if (i === 0) {
-            pageEmbed.setTitle('📋 Runners Registrados');
-          }
-          if (i === chunks.length - 1) {
-            pageEmbed
-              .setFooter({ text: `Total: ${runners.length} runner(s)` })
-              .setTimestamp();
-          }
-
-          return pageEmbed;
-        });
-
-        await interaction.editReply({ embeds: embeds.slice(0, 10) }); // Limite do Discord: 10 embeds
-      }
+      await interaction.editReply(message);
     } catch (error) {
       logger.error('Failed to list runners', { ...ctx, error: String(error) });
-      await interaction.editReply({
-        content: '❌ Ocorreu um erro ao buscar a lista de runners. Tente novamente mais tarde.',
-      });
+      await interaction.editReply('❌ Ocorreu um erro ao buscar a lista de runners. Tente novamente mais tarde.');
     }
   },
 };
