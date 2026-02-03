@@ -1,14 +1,19 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, GuildMember, MessageFlags } from 'discord.js';
-import { Command, isAdmin, formatTwitchUrl } from '../lib/discord';
+import {
+  type ChatInputCommandInteraction,
+  type GuildMember,
+  MessageFlags,
+  SlashCommandBuilder,
+} from 'discord.js';
+import { type Command, formatTwitchUrl, isAdmin } from '../lib/discord';
 import { logger } from '../lib/logger';
 import {
-  getRunnerByStreamName,
-  getRunnerBySourceId,
   createRunner,
-  updateRunner,
   deleteRunnerBySourceId,
+  getRunnerBySourceId,
+  getRunnerByStreamName,
+  updateRunner,
 } from '../lib/supabase';
-import { Runner } from '../types/database';
+import type { Runner } from '../types/database';
 
 interface LogContext {
   command: string;
@@ -44,7 +49,7 @@ function validateUsername(username: string): string | null {
 
 async function handleExistingUsername(
   existing: Runner,
-  context: RegistrationContext
+  context: RegistrationContext,
 ): Promise<RegistrationResult> {
   const { username, sourceId, isForSelf, isAdmin, ctx } = context;
 
@@ -68,7 +73,10 @@ async function handleExistingUsername(
   // Admin can override
   if (isAdmin) {
     await updateRunner(existing.id, { source_id: sourceId, source: 'discord' });
-    logger.info('Admin reassigned username', { ...ctx, previousOwner: existing.source_id });
+    logger.info('Admin reassigned username', {
+      ...ctx,
+      previousOwner: existing.source_id,
+    });
     return {
       message: `✅ Conta da Twitch **${username}** foi reatribuída ${isForSelf ? 'para sua conta' : `para <@${sourceId}>`}.\n${formatTwitchUrl(username)}`,
     };
@@ -83,7 +91,7 @@ async function handleExistingUsername(
 
 async function handleExistingUserAccount(
   existing: Runner,
-  context: RegistrationContext
+  context: RegistrationContext,
 ): Promise<RegistrationResult> {
   const { username, sourceId, isForSelf, isAdmin, ctx } = context;
 
@@ -95,20 +103,28 @@ async function handleExistingUserAccount(
       source_id: sourceId,
       source: 'discord',
     });
-    logger.info('Admin replaced existing registration', { ...ctx, previousUsername: existing.stream_name });
+    logger.info('Admin replaced existing registration', {
+      ...ctx,
+      previousUsername: existing.stream_name,
+    });
     return {
       message: `✅ Registro anterior (**${existing.stream_name}**) substituído por **${username}** ${isForSelf ? 'na sua conta' : `para <@${sourceId}>`}.\n${formatTwitchUrl(username)}`,
     };
   }
 
   // Blocked - user already has an account
-  logger.warn('User already has a linked account', { ...ctx, existingUsername: existing.stream_name });
+  logger.warn('User already has a linked account', {
+    ...ctx,
+    existingUsername: existing.stream_name,
+  });
   return {
     message: `❌ ${isForSelf ? 'Você já tem' : `<@${sourceId}> já tem`} uma conta da Twitch vinculada: **${existing.stream_name}**. Use \`/unlink\` primeiro para removê-la.`,
   };
 }
 
-async function createNewRegistration(context: RegistrationContext): Promise<RegistrationResult> {
+async function createNewRegistration(
+  context: RegistrationContext,
+): Promise<RegistrationResult> {
   const { username, sourceId, isForSelf, ctx } = context;
 
   await createRunner({
@@ -123,7 +139,6 @@ async function createNewRegistration(context: RegistrationContext): Promise<Regi
   };
 }
 
-
 export const command: Command = {
   data: new SlashCommandBuilder()
     .setName('twitch')
@@ -132,17 +147,20 @@ export const command: Command = {
       option
         .setName('username')
         .setDescription('Nome de usuário da Twitch para registrar')
-        .setRequired(true)
+        .setRequired(true),
     )
     .addUserOption((option) =>
       option
         .setName('user')
         .setDescription('Usuário para registrar (apenas usuários permitidos)')
-        .setRequired(false)
+        .setRequired(false),
     ),
 
   async execute(interaction: ChatInputCommandInteraction) {
-    const username = interaction.options.getString('username', true).trim().toLowerCase();
+    const username = interaction.options
+      .getString('username', true)
+      .trim()
+      .toLowerCase();
     const targetUser = interaction.options.getUser('user');
     const member = interaction.member as GuildMember;
     const userIsAdmin = isAdmin(member);
@@ -163,7 +181,10 @@ export const command: Command = {
     // 1. Validate username format
     const validationError = validateUsername(username);
     if (validationError) {
-      await interaction.reply({ content: validationError, flags: [MessageFlags.Ephemeral] });
+      await interaction.reply({
+        content: validationError,
+        flags: [MessageFlags.Ephemeral],
+      });
       return;
     }
 
@@ -171,13 +192,20 @@ export const command: Command = {
     if (!isForSelf && !userIsAdmin) {
       logger.warn('Non-admin tried to register for another user', ctx);
       await interaction.reply({
-        content: '❌ Apenas admins podem registrar contas da Twitch para outros usuários.',
+        content:
+          '❌ Apenas admins podem registrar contas da Twitch para outros usuários.',
         flags: [MessageFlags.Ephemeral],
       });
       return;
     }
 
-    const context: RegistrationContext = { username, sourceId, isForSelf, isAdmin: userIsAdmin, ctx };
+    const context: RegistrationContext = {
+      username,
+      sourceId,
+      isForSelf,
+      isAdmin: userIsAdmin,
+      ctx,
+    };
 
     await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
@@ -201,11 +229,14 @@ export const command: Command = {
       // 5. Create new registration
       const result = await createNewRegistration(context);
       await interaction.editReply({ content: result.message });
-
     } catch (error) {
-      logger.error('Failed to process registration', { ...ctx, error: String(error) });
+      logger.error('Failed to process registration', {
+        ...ctx,
+        error: String(error),
+      });
       await interaction.editReply({
-        content: '❌ Ocorreu um erro ao processar sua solicitação. Tente novamente mais tarde.',
+        content:
+          '❌ Ocorreu um erro ao processar sua solicitação. Tente novamente mais tarde.',
       });
     }
   },

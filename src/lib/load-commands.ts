@@ -1,12 +1,13 @@
-import { readdirSync } from 'fs';
-import { join } from 'path';
-import { Command } from './discord';
+import { readdirSync } from 'node:fs';
+import { join } from 'node:path';
+import type { Command } from './discord';
 
 export async function loadCommands(): Promise<Command[]> {
   const commands: Command[] = [];
   const commandsPath = join(__dirname, '../commands');
   const commandFiles = readdirSync(commandsPath).filter(
-    file => (file.endsWith('.ts') || file.endsWith('.js')) && !file.endsWith('.d.ts')
+    (file) =>
+      (file.endsWith('.ts') || file.endsWith('.js')) && !file.endsWith('.d.ts'),
   );
 
   for (const file of commandFiles) {

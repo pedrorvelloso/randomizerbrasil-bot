@@ -1,11 +1,11 @@
 import {
+  type ChatInputCommandInteraction,
   Client,
-  GatewayIntentBits,
   Collection,
-  ChatInputCommandInteraction,
-  SlashCommandBuilder,
-  SlashCommandOptionsOnlyBuilder,
-  GuildMember,
+  GatewayIntentBits,
+  type GuildMember,
+  type SlashCommandBuilder,
+  type SlashCommandOptionsOnlyBuilder,
 } from 'discord.js';
 
 export interface Command {

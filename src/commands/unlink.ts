@@ -1,7 +1,11 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { Command } from '../lib/discord';
+import {
+  type ChatInputCommandInteraction,
+  MessageFlags,
+  SlashCommandBuilder,
+} from 'discord.js';
+import type { Command } from '../lib/discord';
 import { logger } from '../lib/logger';
-import { getRunnerBySourceId, deleteRunnerBySourceId } from '../lib/supabase';
+import { deleteRunnerBySourceId, getRunnerBySourceId } from '../lib/supabase';
 
 export const command: Command = {
   data: new SlashCommandBuilder()
@@ -37,9 +41,13 @@ export const command: Command = {
         content: `✅ Conta da Twitch **${runner.stream_name}** desvinculada com sucesso da sua conta do Discord.`,
       });
     } catch (error) {
-      logger.error('Failed to unlink account', { ...ctx, error: String(error) });
+      logger.error('Failed to unlink account', {
+        ...ctx,
+        error: String(error),
+      });
       await interaction.editReply({
-        content: '❌ Ocorreu um erro ao desvincular sua conta da Twitch. Tente novamente mais tarde.',
+        content:
+          '❌ Ocorreu um erro ao desvincular sua conta da Twitch. Tente novamente mais tarde.',
       });
     }
   },

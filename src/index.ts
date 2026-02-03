@@ -1,6 +1,10 @@
 import 'dotenv/config';
-import { Events, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { createClient, ExtendedClient } from './lib/discord';
+import {
+  type ChatInputCommandInteraction,
+  Events,
+  MessageFlags,
+} from 'discord.js';
+import { createClient, type ExtendedClient } from './lib/discord';
 import { loadCommands } from './lib/load-commands';
 import { logger } from './lib/logger';
 
@@ -14,7 +18,10 @@ async function initialize() {
     client.commands.set(command.data.name, command);
   }
 
-  logger.info('Commands loaded', { count: commands.length, commands: commands.map(c => c.data.name) });
+  logger.info('Commands loaded', {
+    count: commands.length,
+    commands: commands.map((c) => c.data.name),
+  });
 
   client.once(Events.ClientReady, (readyClient) => {
     logger.info('Bot started', {
@@ -76,7 +83,7 @@ function shutdown() {
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
 
-initialize().catch(error => {
+initialize().catch((error) => {
   logger.error('Failed to initialize bot', { error: String(error) });
   process.exit(1);
 });

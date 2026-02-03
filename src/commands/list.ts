@@ -1,9 +1,9 @@
 import {
-  SlashCommandBuilder,
-  ChatInputCommandInteraction,
+  type ChatInputCommandInteraction,
   MessageFlags,
+  SlashCommandBuilder,
 } from 'discord.js';
-import { Command } from '../lib/discord';
+import type { Command } from '../lib/discord';
 import { logger } from '../lib/logger';
 import { getRunners } from '../lib/rbr-api';
 
@@ -28,7 +28,9 @@ export const command: Command = {
 
       if (count === 0) {
         logger.info('No runners registered', ctx);
-        await interaction.editReply('ℹ️ Nenhum runner está registrado no momento.');
+        await interaction.editReply(
+          'ℹ️ Nenhum runner está registrado no momento.',
+        );
         return;
       }
 
@@ -48,7 +50,9 @@ export const command: Command = {
       await interaction.editReply(message);
     } catch (error) {
       logger.error('Failed to list runners', { ...ctx, error: String(error) });
-      await interaction.editReply('❌ Ocorreu um erro ao buscar a lista de runners. Tente novamente mais tarde.');
+      await interaction.editReply(
+        '❌ Ocorreu um erro ao buscar a lista de runners. Tente novamente mais tarde.',
+      );
     }
   },
 };

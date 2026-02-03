@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-02-03
+
+### Added
+- Biome for linting and formatting (version 2.3.13)
+- New scripts: `lint`, `lint:fix`, `format`, `format:fix`, `check`, `check:fix`
+- `biome.json` configuration file with recommended rules
+- `CLAUDE.md` project documentation for contributors
+- Code Quality section in README documenting linting standards
+
+### Changed
+- Console logs in `register-commands.ts` and `clear-commands.ts` to English
+- Replaced unsafe non-null assertions (`!`) with proper environment variable validation
+- Empty object types (`{}`) in `database.ts` to `Record<string, never>`
+- Package manager commands in README from npm to pnpm
+- Updated README Stack section with all current technologies
+- Auto-formatted all source files with Biome for consistency
+
+### Fixed
+- Environment variable handling now throws descriptive errors when missing
+- Node.js imports now use `node:` protocol (e.g., `node:fs`, `node:path`)
+
 ## [1.3.0] - 2026-02-03
 
 ### Added
