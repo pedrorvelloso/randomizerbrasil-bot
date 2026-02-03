@@ -8,6 +8,7 @@ import { logger } from '../lib/logger';
 import { getRunners } from '../lib/rbr-api';
 
 export const command: Command = {
+  isGlobal: true,
   data: new SlashCommandBuilder()
     .setName('list')
     .setDescription('Listar todos os runners'),

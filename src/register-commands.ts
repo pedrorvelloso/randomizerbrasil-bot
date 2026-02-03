@@ -14,10 +14,13 @@ async function registerCommands() {
     console.log('Updating application (/) commands...');
 
     const commandModules = await loadCommands();
-    const commands = commandModules.map((cmd) => cmd.data.toJSON());
+
+    // Separate commands by scope
+    const globalCommands = commandModules.filter((cmd) => cmd.isGlobal);
+    const allCommands = commandModules.map((cmd) => cmd.data.toJSON());
 
     console.log(
-      `Loaded ${commands.length} command(s): ${commandModules.map((c) => c.data.name).join(', ')}`,
+      `Loaded ${commandModules.length} command(s): ${commandModules.map((c) => c.data.name).join(', ')}`,
     );
 
     const clientId = process.env.DISCORD_CLIENT_ID;
@@ -27,19 +30,27 @@ async function registerCommands() {
       );
     }
 
+    // Register global commands to global endpoint (available in all servers)
+    if (globalCommands.length > 0) {
+      const globalCommandsData = globalCommands.map((cmd) => cmd.data.toJSON());
+      await rest.put(Routes.applicationCommands(clientId), {
+        body: globalCommandsData,
+      });
+      const globalNames = globalCommands.map((c) => c.data.name).join(', ');
+      console.log(
+        `Registered ${globalCommands.length} global command(s): ${globalNames}`,
+      );
+    }
+
+    // Register ALL commands to guild (if DISCORD_GUILD_ID is set)
     if (process.env.DISCORD_GUILD_ID) {
-      // Register commands in a specific server (faster for development)
       await rest.put(
         Routes.applicationGuildCommands(clientId, process.env.DISCORD_GUILD_ID),
-        { body: commands },
+        { body: allCommands },
       );
       console.log(
-        `Successfully registered commands to guild ${process.env.DISCORD_GUILD_ID}`,
+        `Registered ${allCommands.length} command(s) to guild ${process.env.DISCORD_GUILD_ID}`,
       );
-    } else {
-      // Register global commands (may take up to an hour to propagate)
-      await rest.put(Routes.applicationCommands(clientId), { body: commands });
-      console.log('Successfully registered global commands');
     }
   } catch (error) {
     console.error('Error registering commands:', error);

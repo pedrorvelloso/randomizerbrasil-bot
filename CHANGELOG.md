@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-02-03
+
+### Added
+- Global vs guild command registration system
+- `isGlobal` property on Command interface to mark commands as globally available
+- `/list` and `/online` commands now available in ALL Discord servers (globally registered)
+
+### Changed
+- Registration logic now handles both global and guild commands separately
+- Global commands register to global endpoint (available everywhere)
+- Guild commands register only to RBR community Discord
+- RBR guild receives ALL commands (global + guild-only)
+
 ## [1.4.0] - 2026-02-03
 
 ### Added
