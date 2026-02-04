@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-02-03
+
+### Added
+- `/help` command to list available commands with descriptions
+- Context-aware command display (shows all commands in RBR guild, only global commands elsewhere)
+- Dynamic command loading in help command using `loadCommands()` utility
+- RBR website link when `/help` is used outside the RBR guild
+
 ## [1.5.0] - 2026-02-03
 
 ### Added
