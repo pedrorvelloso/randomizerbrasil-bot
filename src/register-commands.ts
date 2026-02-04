@@ -17,10 +17,16 @@ async function registerCommands() {
 
     // Separate commands by scope
     const globalCommands = commandModules.filter((cmd) => cmd.isGlobal);
-    const allCommands = commandModules.map((cmd) => cmd.data.toJSON());
+    const guildCommands = commandModules.filter((cmd) => !cmd.isGlobal);
 
     console.log(
       `Loaded ${commandModules.length} command(s): ${commandModules.map((c) => c.data.name).join(', ')}`,
+    );
+    console.log(
+      `  Global: ${globalCommands.map((c) => c.data.name).join(', ') || 'none'}`,
+    );
+    console.log(
+      `  Guild-only: ${guildCommands.map((c) => c.data.name).join(', ') || 'none'}`,
     );
 
     const clientId = process.env.DISCORD_CLIENT_ID;
@@ -42,14 +48,16 @@ async function registerCommands() {
       );
     }
 
-    // Register ALL commands to guild (if DISCORD_GUILD_ID is set)
-    if (process.env.DISCORD_GUILD_ID) {
+    // Register guild-only commands to guild (if DISCORD_GUILD_ID is set)
+    if (process.env.DISCORD_GUILD_ID && guildCommands.length > 0) {
+      const guildCommandsData = guildCommands.map((cmd) => cmd.data.toJSON());
       await rest.put(
         Routes.applicationGuildCommands(clientId, process.env.DISCORD_GUILD_ID),
-        { body: allCommands },
+        { body: guildCommandsData },
       );
+      const guildNames = guildCommands.map((c) => c.data.name).join(', ');
       console.log(
-        `Registered ${allCommands.length} command(s) to guild ${process.env.DISCORD_GUILD_ID}`,
+        `Registered ${guildCommands.length} guild command(s): ${guildNames}`,
       );
     }
   } catch (error) {

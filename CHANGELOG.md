@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2026-02-03
+
+### Fixed
+- Command registration now properly separates global and guild commands
+- Global commands (help, list, online) register only to global endpoint
+- Guild-only commands (twitch, mytwitch, unlink, remove) register only to guild endpoint
+- Eliminated duplicate command registration in RBR guild
+
+### Changed
+- Improved command registration logging to show command breakdown by scope
+
 ## [1.6.0] - 2026-02-03
 
 ### Added
