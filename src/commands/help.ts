@@ -11,7 +11,7 @@ export const command: Command = {
   isGlobal: true,
   data: new SlashCommandBuilder()
     .setName('help')
-    .setDescription('Mostrar comandos disponíveis'),
+    .setDescription('Listar comandos disponíveis e suas descrições'),
 
   async execute(interaction: ChatInputCommandInteraction) {
     const ctx = {
