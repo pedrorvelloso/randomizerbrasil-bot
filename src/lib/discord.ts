@@ -21,7 +21,7 @@ export interface ExtendedClient extends Client {
 
 export function createClient(): ExtendedClient {
   const client = new Client({
-    intents: [GatewayIntentBits.Guilds],
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
   }) as ExtendedClient;
 
   client.commands = new Collection();
