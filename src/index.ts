@@ -4,11 +4,14 @@ import {
   Events,
   MessageFlags,
 } from 'discord.js';
+import type { FastifyInstance } from 'fastify';
+import { createApiServer, startApiServer } from './api/server';
 import { createClient, type ExtendedClient } from './lib/discord';
 import { loadCommands } from './lib/load-commands';
 import { logger } from './lib/logger';
 
 const client: ExtendedClient = createClient();
+let apiServer: FastifyInstance | null = null;
 
 // Load and register commands
 async function initialize() {
@@ -23,11 +26,22 @@ async function initialize() {
     commands: commands.map((c) => c.data.name),
   });
 
-  client.once(Events.ClientReady, (readyClient) => {
+  client.once(Events.ClientReady, async (readyClient) => {
     logger.info('Bot started', {
       username: readyClient.user.tag,
       guildCount: readyClient.guilds.cache.size,
     });
+
+    // Start API server after Discord client is ready (if enabled)
+    if (process.env.API_ENABLED === 'true') {
+      try {
+        apiServer = createApiServer(client);
+        const address = await startApiServer(apiServer);
+        logger.info('API server started', { address });
+      } catch (error) {
+        logger.error('Failed to start API server', { error: String(error) });
+      }
+    }
   });
 
   client.on(Events.InteractionCreate, async (interaction) => {
@@ -74,8 +88,13 @@ async function initialize() {
 }
 
 // Graceful shutdown
-function shutdown() {
+async function shutdown() {
   logger.info('Shutting down...');
+
+  if (apiServer) {
+    await apiServer.close();
+  }
+
   client.destroy();
   process.exit(0);
 }
